@@ -1,4 +1,4 @@
-enum SegmentationPreset { quality, balanced, speed }
+enum SegmentationPreset { quality, balanced, speed, lightning }
 
 enum FitMode { fill, fit }
 
