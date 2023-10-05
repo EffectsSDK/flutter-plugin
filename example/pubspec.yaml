@@ -8,7 +8,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_webrtc: ^0.9.22
+  flutter_webrtc: ^0.9.45
 
   effects_sdk:
     path: ../
