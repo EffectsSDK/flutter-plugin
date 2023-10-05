@@ -2,6 +2,7 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
 
 import 'effects_sdk_components.dart';
+import 'effects_sdk_config.dart';
 import 'effects_sdk_enums.dart';
 import 'effects_sdk_method_channel.dart';
 
@@ -37,6 +38,10 @@ abstract class EffectsSDKPlatform extends PlatformInterface {
   void clearOnReadyCallback(Object sdkContext) {
     throw UnimplementedError(
         'clearOnReadyCallback() has not been implemented.');
+  }
+
+  void config(Object sdkContext, Config config) {
+    throw UnimplementedError('config() has not been implemented.');
   }
 
   void useStream(Object sdkContext, webrtc.MediaStream stream) {

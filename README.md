@@ -91,6 +91,32 @@ The property is true when SDK is ready to process video, method `run` can be cal
 clear() -\> **void**  
 Disables enabled features and stops processing.
 
+config(**Config** *config*) -\> **void**  
+Ability to configure sdk execution environment.  
+Arguments:
+- **Config** *config* - settings to be changed, [see **Config**](#class-config)
+
+Example of how to change default segmentation preset  
+```dart
+_effectsSDK.config(Config(preset: SegmentationPreset.lightning));
+```
+
+Example of how to disable colorcorrection and facedetection  
+```dart
+_effectsSDK.config(Config(
+    models: {
+      'colorcorrector': '',
+      'facedetector': '',
+    }));
+```
+
+Example of how to host models on custom domain  
+```dart
+    _effectsSDK.config(Config(
+      sdkUrl: 'https://domain.com/sdk/'  // in this derectory should be subfolder models with all required models
+    ));
+```
+
 **NOTE**: Don't use next methods until this instance is ready.
 
 run()-\> **void**  
@@ -306,6 +332,49 @@ Arguments:
 
 components -\> **UnmodifiableMapView**<**String**, **Component**>
 Read-only property that returns a copy of component map. Key is id.
+
+### class Config
+
+Config contains settings to change in Effects SDK.
+
+apiUrl -\> **String**?
+
+Custom url for sdk authentication, applicable for on-premises solutions.
+
+sdkUrl -\> **String**?
+
+This parameter specify the url to SDK folder in case when you host model files by yourself.
+
+preset -\> **SegmentationPreset**? 
+
+Specify default segmentation preset (quality, balanced, speed, lightning).
+
+proxy -\> **bool**?
+
+Configuration specify if segmentation should be working in separate worker thread (not in main UI thread), default value is true.
+
+stats -\> **bool**?
+
+Enabling/disabling statistics sending.
+
+models -\> **Map\<String, String\>**?
+
+Ability to provide custom name of model, if it's empty feature will be disabled.
+
+wasmPaths -\> **Map\<String, String\>**?
+
+Currently wasm files are loading from the same directory where SDK is placed, but custom urls also supported (for example you can load it from CDNs).
+
+Example
+```dart
+_effectsSDK.config(Config(
+    wasmPaths: {
+      'ort-wasm.wasm': 'url',
+      'ort-wasm-simd.wasm': 'url',
+      'ort-wasm-threaded.wasm': 'url',
+      'ort-wasm-simd-threaded.wasm': 'url'
+}));
+```
 
 ### enum SegmentationPreset
 

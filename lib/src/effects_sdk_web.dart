@@ -7,6 +7,7 @@ import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
 
 import 'effects_sdk_components.dart';
+import 'effects_sdk_config.dart';
 import 'effects_sdk_platform_interface.dart';
 import 'effects_sdk_enums.dart';
 
@@ -73,6 +74,34 @@ class EffectsSDKWeb extends EffectsSDKPlatform {
   @override
   void clearOnReadyCallback(Object sdkContext) {
     jsutil.setProperty(sdkContext, "onReady", null);
+  }
+
+  @override
+  void config(Object sdkContext, Config config) {
+    final jsConfig = jsutil.newObject();
+    _setPropertyIfNotNull(jsConfig, "api_url", config.apiUrl);
+    _setPropertyIfNotNull(jsConfig, "sdk_url", config.sdkUrl);
+    _setPropertyIfNotNull(jsConfig, "preset", config.preset?.name);
+    _setPropertyIfNotNull(jsConfig, "proxy", config.proxy);
+    _setPropertyIfNotNull(jsConfig, "stats", config.stats);
+
+    if (null != config.models) {
+      final jsModels = jsutil.newObject();
+      config.models?.forEach((String model, String url) {
+        jsutil.setProperty(jsModels, model, url);
+      });
+      jsutil.setProperty(jsConfig, "models", jsModels);
+    }
+
+    if (null != config.wasmPaths) {
+      final jsWasmPaths = jsutil.newObject();
+      config.wasmPaths?.forEach((String model, String url) {
+        jsutil.setProperty(jsWasmPaths, model, url);
+      });
+      jsutil.setProperty(jsConfig, "wasmPaths", jsWasmPaths);
+    }
+
+    _callJSMethod(sdkContext, "config", [jsConfig]);
   }
 
   @override

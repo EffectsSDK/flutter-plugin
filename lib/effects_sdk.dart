@@ -1,6 +1,7 @@
 library effects_sdk;
 
 export "src/effects_sdk.dart" show EffectsSDK;
+export "src/effects_sdk_config.dart" show Config;
 export "src/effects_sdk_enums.dart"
     show SegmentationPreset, FitMode, BoundaryMode, Layout;
 export "src/effects_sdk_components.dart"

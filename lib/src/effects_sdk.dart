@@ -4,6 +4,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
 
 import 'effects_sdk_components.dart';
 import 'effects_sdk_platform_interface.dart';
+import 'effects_sdk_config.dart';
 import 'effects_sdk_enums.dart';
 
 class EffectsSDK {
@@ -21,6 +22,10 @@ class EffectsSDK {
     }
 
     EffectsSDKPlatform.instance.setOnReadyCallback(_sdkContext, callback);
+  }
+
+  void config(Config config) {
+    EffectsSDKPlatform.instance.config(_sdkContext, config);
   }
 
   void useStream(webrtc.MediaStream stream) {
