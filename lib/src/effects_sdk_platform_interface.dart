@@ -162,6 +162,21 @@ abstract class EffectsSDKPlatform extends PlatformInterface {
         'setColorCorrectorPeriod() has not been implemented.');
   }
 
+  void enableLowLightEffect(Object sdkContext) {
+    throw UnimplementedError(
+        'enableLowLightEffect() has not been implemented.');
+  }
+
+  void disableLowLightEffect(Object sdkContext) {
+    throw UnimplementedError(
+        'disableLowLightEffect() has not been implemented.');
+  }
+
+  void setLowLightEffectPower(Object sdkContext, double value) {
+    throw UnimplementedError(
+        'setLowLightEffectPower() has not been implemented.');
+  }
+
   void setLayout(Object sdkContext, Layout layout) {
     throw UnimplementedError('setLayout() has not been implemented.');
   }

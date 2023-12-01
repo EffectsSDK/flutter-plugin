@@ -163,6 +163,21 @@ class EffectsSDK {
     EffectsSDKPlatform.instance.setColorCorrectorPeriod(_sdkContext, periodMs);
   }
 
+  void enableLowLightEffect() {
+    _throwIfNotReady("enableLowLightEffect()");
+    EffectsSDKPlatform.instance.enableLowLightEffect(_sdkContext);
+  }
+
+  void disableLowLightEffect() {
+    _throwIfNotReady("disableLowLightEffect()");
+    EffectsSDKPlatform.instance.disableLowLightEffect(_sdkContext);
+  }
+
+  void setLowLightEffectPower(double value) {
+    _throwIfNotReady("setLowLightEffectPower()");
+    EffectsSDKPlatform.instance.setLowLightEffectPower(_sdkContext, value);
+  }
+
   void setLayout(Layout layout) {
     _throwIfNotReady("setLayout()");
     EffectsSDKPlatform.instance.setLayout(_sdkContext, layout);

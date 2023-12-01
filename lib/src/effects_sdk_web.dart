@@ -58,7 +58,7 @@ class EffectsSDKWeb extends EffectsSDKPlatform {
   Object createContext(String customerID) {
     if (!jsutil.hasProperty(html.window, "tsvb")) {
       throw StateError('tsvb has not been loaded.'
-          ' Please, add <script src="https://effectssdk.com/sdk/dev/2.5.3/tsvb-web.js"></script> to your index.html');
+          ' Please, add <script src="https://effectssdk.ai/sdk/web/2.6.8/tsvb-web.js"></script> to your index.html');
     }
 
     final tsvb = jsutil.getProperty(html.window, "tsvb");
@@ -244,6 +244,21 @@ class EffectsSDKWeb extends EffectsSDKPlatform {
   @override
   void setColorCorrectorPeriod(Object sdkContext, int periodMs) {
     _callJSMethod(sdkContext, "setColorCorrectorPeriod", [periodMs]);
+  }
+
+  @override
+  void enableLowLightEffect(Object sdkContext) {
+    _callJSMethod(sdkContext, "enableLowLightEffect", []);
+  }
+
+  @override
+  void disableLowLightEffect(Object sdkContext) {
+    _callJSMethod(sdkContext, "disableLowLightEffect", []);
+  }
+
+  @override
+  void setLowLightEffectPower(Object sdkContext, double value) {
+    _callJSMethod(sdkContext, "setLowLightEffectPower", [value]);
   }
 
   @override

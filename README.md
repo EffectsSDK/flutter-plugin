@@ -26,9 +26,9 @@ To receive an **Effects SDK** license, please fill out the contact form on [effe
 
 ### How to add
 
-Add `<script src="https://effectssdk.com/sdk/dev/2.5.3/tsvb-web.js"></script>` to your index.html.
+Add `<script src="https://effectssdk.ai/sdk/web/2.6.8/tsvb-web.js"></script>` to your index.html.
 
-Add next code as dependency in your pubspec.yaml file.
+Add next code as a dependency in your pubspec.yaml file.
 ```yaml
   effects_sdk:
     git:
@@ -220,15 +220,28 @@ Enable color correction effect.
 disableColorCorrector() -\> **void**
 Disable color correction effect.
 
-setColorCorrectorPower(**double** power) -\> **void**
+setColorCorrectorPower(**double** power) -\> **void**  
 Control how strong the effect aplied.
 Arguments:
 - **double** power - a value from 0 to 1. Higher number -\> more visible effect.
 
-setColorCorrectorPeriod(**int** periodMs) -\> **void** 
+setColorCorrectorPeriod(**int** periodMs) -\> **void**  
 Set period in milliseconds for color correction model working.
 Arguments:
 - **int** periodMs - Period duration in milliseconds. Can be from 0 to 5000 (default 1000)
+
+enableLowLightEffect() -\> **void**  
+Enable the brightening effect.  
+Low Light Effect enhances the brightness of a dark video. It is useful when the video has a darker environment.
+It's recommended to use together with Color Correction.
+
+disableLowLightEffect() -\> **void**  
+Disable the brightening effect.
+
+setLowLightEffectPower(**double** power) -\> **void**  
+Control how strong the effect aplied.
+Arguments:
+- **double** power - a value from 0 to 1. Higher number -\> more visible effect.
 
 setLayout(**Layout** layout) -\> **void**
 Set the layout mode. Useful for presentations.
