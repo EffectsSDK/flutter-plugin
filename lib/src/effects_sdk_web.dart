@@ -337,7 +337,7 @@ class EffectsSDKWeb extends EffectsSDKPlatform {
     final jsOptions = _jsifyLowerThirdOptions(options);
 
     final params = jsutil.newObject();
-    jsutil.setProperty(params, "component", "lower_third_1");
+    jsutil.setProperty(params, "component", "lowerthird_1");
     jsutil.setProperty(params, "options", jsOptions);
 
     return _callJSMethod(sdkContext, "createComponent", [params]);
@@ -491,14 +491,24 @@ class EffectsSDKWeb extends EffectsSDKPlatform {
 
   Object _jsifyLowerThirdOptions(LowerThirdOptions options) {
     final jsOptions = jsutil.newObject();
-    _setPropertyIfNotNull(jsOptions, "title", options.title);
-    _setPropertyIfNotNull(jsOptions, "subtitle", options.subtitle);
+    final jsTextOptions = jsutil.newObject();
+    _setPropertyIfNotNull(jsTextOptions, "title", options.title);
+    _setPropertyIfNotNull(jsTextOptions, "subtitle", options.subtitle);
+    _setPropertyIfNotNull(jsOptions, "text", jsTextOptions);
+
+    final jsColorOptions = jsutil.newObject();
     _setPropertyIfNotNull(
-        jsOptions, "primaryColor", _removeAlphaChannel(options.primaryColor));
-    _setPropertyIfNotNull(
-        jsOptions, "left", options.left != null ? options.left! * 100 : null);
-    _setPropertyIfNotNull(jsOptions, "bottom",
-        options.bottom != null ? options.bottom! * 100 : null);
+        jsColorOptions, "primary", _removeAlphaChannel(options.primaryColor));
+    _setPropertyIfNotNull(jsOptions, "color", jsColorOptions);
+
+    if (null != options.left || null != options.bottom) {
+      final jsOffsetOption = jsutil.newObject();
+      _setPropertyIfNotNull(jsOffsetOption, "x",
+          options.left != null ? options.left! * 100 : null);
+      _setPropertyIfNotNull(jsOffsetOption, "y",
+          options.bottom != null ? options.bottom! * 100 : null);
+      _setPropertyIfNotNull(jsOptions, "offset", jsOffsetOption);
+    }
 
     return jsOptions;
   }
