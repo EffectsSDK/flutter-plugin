@@ -52,12 +52,36 @@ abstract class EffectsSDKPlatform extends PlatformInterface {
     throw UnimplementedError('getStream() has not been implemented.');
   }
 
+  Future<void> cache(Object sdkContext, { required bool clear }) {
+    throw UnimplementedError('cache() has not been implemented.');
+  }
+
   void clear(Object sdkContext) {
     throw UnimplementedError('clear() has not been implemented.');
   }
 
+  Future<void> preload(Object sdkContext) {
+    throw UnimplementedError('preload() has not been implemented.');
+  }
+
   bool run(Object sdkContext) {
     throw UnimplementedError('run() has not been implemented.');
+  }
+
+  void setOnChangeInputResolutionCallback(Object sdkContext, Function? callback) {
+    throw UnimplementedError('setOnChangeInputResolutionCallback() has not been implemented.');
+  }
+
+  void setOnColorFilterSuccessCallback(Object sdkContext, Function(String id)? callback) {
+    throw UnimplementedError('setOnColorFilterSuccessCallback() has not been implemented.');
+  }
+
+  void setOnErrorCallback(Object sdkContext, Function(dynamic e)? callback) {
+    throw UnimplementedError('setOnErrorCallback() has not been implemented.');
+  }
+
+  void setOnLowLightSuccessCallback(Object sdkContext, Function? callback) {
+    throw UnimplementedError('setOnLowLightSuccessCallback() has not been implemented.');
   }
 
   void clearBackground(Object sdkContext) {
@@ -162,6 +186,21 @@ abstract class EffectsSDKPlatform extends PlatformInterface {
         'setColorCorrectorPeriod() has not been implemented.');
   }
 
+  bool enableColorFilter(Object sdkContext) {
+    throw UnimplementedError(
+        'enableColorFilter() has not been implemented.');
+  }
+
+  bool disableColorFilter(Object sdkContext) {
+    throw UnimplementedError(
+        'disableColorFilter() has not been implemented.');
+  }
+
+  Future<void> setColorFilterConfig(Object sdkContext, ColorFilterConfig config) {
+    throw UnimplementedError(
+        'setColorFilterConfig() has not been implemented.');
+  }
+
   void enableLowLightEffect(Object sdkContext) {
     throw UnimplementedError(
         'enableLowLightEffect() has not been implemented.');
@@ -170,6 +209,11 @@ abstract class EffectsSDKPlatform extends PlatformInterface {
   void disableLowLightEffect(Object sdkContext) {
     throw UnimplementedError(
         'disableLowLightEffect() has not been implemented.');
+  }
+
+  void setLowLightEffectConfig(Object sdkContext, LowLightConfig config) {
+    throw UnimplementedError(
+        'setLowLightEffectConfig() has not been implemented.');
   }
 
   void setLowLightEffectPower(Object sdkContext, double value) {
@@ -198,8 +242,16 @@ abstract class EffectsSDKPlatform extends PlatformInterface {
     throw UnimplementedError('setFpsLimit() has not been implemented.');
   }
 
+  void setOutputFrameFormat(Object sdkContext, FrameFormat format) {
+    throw UnimplementedError('setOutputResolution() has not been implemented.');
+  }
+
   void setOutputResolution(Object sdkContext, int? width, int? height) {
     throw UnimplementedError('setOutputResolution() has not been implemented.');
+  }
+
+  void clearOutputResolution(Object sdkContext) {
+    throw UnimplementedError('clearOutputResolution() has not been implemented.');
   }
 
   void enableFrameSkipping(Object sdkContext) {
@@ -248,6 +300,14 @@ abstract class EffectsSDKPlatform extends PlatformInterface {
     throw UnimplementedError('addComponent() has not been implemented.');
   }
 
+  void removeComponent(Object sdkContext, String id) {
+    throw UnimplementedError('removeComponent() has not been implemented.');
+  }
+
+  void componentDestroy(Object component) {
+    throw UnimplementedError('componentDestroy() has not been implemented.');
+  }
+
   void componentSetOnBeforeShow(Object component, Function? func) {
     throw UnimplementedError(
         'componentSetOnBeforeShow() has not been implemented.');
@@ -272,6 +332,16 @@ abstract class EffectsSDKPlatform extends PlatformInterface {
       Object component, Function(String, String?)? func) {
     throw UnimplementedError(
         'componentSetOnStickerLoadSucces() has not been implemented.');
+  }
+
+  Object createWatermarkComponent(Object sdkContext, WatermarkOptions options) {
+    throw UnimplementedError(
+        'createWatermarkComponent() has not been implemented.');
+  }
+
+  void componentSetWatermarkOptions(Object component, WatermarkOptions options) {
+    throw UnimplementedError(
+        'componentSetWatermarkOptions() has not been implemented.');
   }
 
   void componentSetOnStickerLoadError(
@@ -309,8 +379,23 @@ abstract class EffectsSDKPlatform extends PlatformInterface {
         'componentPlaySticker() has not been implemented.');
   }
 
+  void componentPreloadSticker(Object component, String url) {
+    throw UnimplementedError(
+        'componentPreloadSticker() has not been implemented.');
+  }
+
   void componentSetStickerOptions(Object component, StickerOptions options) {
     throw UnimplementedError(
         'componentSetStickerOptions() has not been implemented.');
+  }
+
+  bool freeze(Object sdkContext) {
+    throw UnimplementedError(
+        'freeze() has not been implemented.');
+  }
+
+  bool unfreeze(Object sdkContext) {
+    throw UnimplementedError(
+        'unfreeze() has not been implemented.');
   }
 }

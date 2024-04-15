@@ -1,6 +1,16 @@
 import 'effects_sdk_platform_interface.dart';
+import 'effects_sdk_enums.dart';
 
-enum ComponentType { stickers, lowerThird, overlayScreen }
+enum ComponentType { stickers, lowerThird, overlayScreen, watermark }
+enum LowerThirdType { lowerthird_1, lowerthird_2, lowerthird_3, lowerthird_4, lowerthird_5 }
+
+class ComponentPosition {
+  double? x;
+  double? y;
+  Placement? placement;
+
+  ComponentPosition({this.x, this.y, this.placement});
+}
 
 abstract class Component {
   final Object _componentContext;
@@ -14,6 +24,10 @@ abstract class Component {
 
   void hide() {
     EffectsSDKPlatform.instance.componentHide(_componentContext);
+  }
+
+  void destroy() {
+    EffectsSDKPlatform.instance.componentDestroy(_componentContext);
   }
 
   set onBeforeShow(Function? handler) {
@@ -42,9 +56,11 @@ abstract class Component {
 }
 
 class LowerThirdOptions {
+  LowerThirdType? type;
   String? title;
   String? subtitle;
   int? primaryColor;
+  int? secondaryColor;
 
   double? left;
   double? bottom;
@@ -68,28 +84,16 @@ class LowerThirdComponent extends Component {
   }
 }
 
-enum StickerPlacement {
-  topLeft,
-  bottomLeft,
-  center,
-  topRight,
-  bottomRight,
-  custom
-}
-
-class StickerPosition {
-  double? x;
-  double? y;
-  StickerPlacement? placement;
-
-  StickerPosition({this.x, this.y, this.placement});
-}
+typedef StickerPlacement = Placement;
+typedef StickerPosition = ComponentPosition;
 
 class StickerOptions {
   int capacity;
   Duration duration;
+  double? animationSpeed;
   StickerPosition? position;
   double? size;
+  double? ratio;
 
   StickerOptions(
       {required this.capacity, required this.duration, this.position});
@@ -101,6 +105,10 @@ class StickersComponent extends Component {
 
   void playSticker({required String url}) {
     EffectsSDKPlatform.instance.componentPlaySticker(_componentContext, url);
+  }
+
+  void preloadSticker({required String url}) {
+    EffectsSDKPlatform.instance.componentPreloadSticker(_componentContext, url);
   }
 
   void setOnLoadSuccess(Function(String url, String? removedUrl)? handler) {
@@ -132,5 +140,21 @@ class OverlayScreenComponent extends Component {
   void setOptions(OverlayScreenOptions options) {
     EffectsSDKPlatform.instance
         .componentSetOverlayScreenOptions(_componentContext, options);
+  }
+}
+
+class WatermarkOptions {
+  String? url;
+  ComponentPosition? position;
+  double? size;
+
+  WatermarkOptions({this.url, this.position, this.size});
+}
+class WatermarkComponent extends Component {
+  WatermarkComponent(Object componenContext)
+    : super(componenContext, ComponentType.watermark);
+  void setOptions(WatermarkOptions options) {
+    EffectsSDKPlatform.instance
+        .componentSetWatermarkOptions(_componentContext, options);
   }
 }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:html' as html show window;
 import 'dart:js' as js;
 import 'dart:js_util' as jsutil;
@@ -23,7 +24,7 @@ String webNameOfLayout(Layout layout) {
   return webNamesOfLayout()[layout]!;
 }
 
-Map<StickerPlacement, String> webNamesOfStickerPlacement() {
+Map<StickerPlacement, String> webNamesOfPlacement() {
   return {
     StickerPlacement.topLeft: "top-left",
     StickerPlacement.bottomLeft: "bottom-left",
@@ -34,8 +35,51 @@ Map<StickerPlacement, String> webNamesOfStickerPlacement() {
   };
 }
 
-String? webNameOfStickerPlacement(StickerPlacement? placement) {
-  return (null != placement) ? webNamesOfStickerPlacement()[placement] : null;
+String? webNameOfPlacement(Placement? placement) {
+  return (null != placement) ? webNamesOfPlacement()[placement] : null;
+}
+
+Map<FrameFormat, String> webNamesOfFrameFormat() {
+  return {
+    FrameFormat.rgbx: "RGBX",
+    FrameFormat.i420: "I420"
+  };
+}
+
+String webNameOfFrameFormat(FrameFormat format) {
+  final nameMap = webNamesOfFrameFormat();
+  final name = nameMap[format];
+  return name!;
+}
+
+Map<MLBackend, String> webMLProviders() {
+  return {
+    MLBackend.auto: "auto",
+    MLBackend.cpu: "wasm",
+    MLBackend.gpu: "webgpu",
+  };
+}
+
+Map<LowerThirdType, String> webNamesOfLowerThird() {
+  return {
+    LowerThirdType.lowerthird_1: "lowerthird_1",
+    LowerThirdType.lowerthird_2: "lowerthird_2",
+    LowerThirdType.lowerthird_3: "lowerthird_3",
+    LowerThirdType.lowerthird_4: "lowerthird_4",
+    LowerThirdType.lowerthird_5: "lowerthird_5"
+  };
+}
+
+String webNameOfLowerThirdType(LowerThirdType type) {
+  final name = webNamesOfLowerThird()[type];
+  if (null == name) {
+    throw ArgumentError("Unknown LowerThirdType", type.toString());
+  }
+  return name!;
+}
+
+String? webMLProvider(MLBackend? mlBackend) {
+  return (null != mlBackend)? webMLProviders()[mlBackend] : null;
 }
 
 class StickerContext {
@@ -58,7 +102,7 @@ class EffectsSDKWeb extends EffectsSDKPlatform {
   Object createContext(String customerID) {
     if (!jsutil.hasProperty(html.window, "tsvb")) {
       throw StateError('tsvb has not been loaded.'
-          ' Please, add <script src="https://effectssdk.ai/sdk/web/2.6.8/tsvb-web.js"></script> to your index.html');
+          ' Please, add <script src="https://effectssdk.ai/sdk/web/3.1.5/tsvb-web.js"></script> to your index.html');
     }
 
     final tsvb = jsutil.getProperty(html.window, "tsvb");
@@ -84,6 +128,7 @@ class EffectsSDKWeb extends EffectsSDKPlatform {
     _setPropertyIfNotNull(jsConfig, "preset", config.preset?.name);
     _setPropertyIfNotNull(jsConfig, "proxy", config.proxy);
     _setPropertyIfNotNull(jsConfig, "stats", config.stats);
+    _setPropertyIfNotNull(jsConfig, "provider", webMLProvider(config.mlBackend));
 
     if (null != config.models) {
       final jsModels = jsutil.newObject();
@@ -118,13 +163,45 @@ class EffectsSDKWeb extends EffectsSDKPlatform {
   }
 
   @override
+  Future<void> cache(Object sdkContext, { required bool clear }) {
+    return jsutil.promiseToFuture(_callJSMethod(sdkContext, "cache", [clear]));
+  }
+
+  @override
   void clear(Object sdkContext) {
     _callJSMethod(sdkContext, "clear", []);
   }
 
   @override
+  Future<void> preload(Object sdkContext) {
+    return jsutil.promiseToFuture(
+      _callJSMethod(sdkContext, "preload", [])
+    );
+  }
+
+  @override
   bool run(Object sdkContext) {
     return _callJSMethod(sdkContext, "run", []);
+  }
+
+  @override
+  void setOnChangeInputResolutionCallback(Object sdkContext, Function? callback) {
+    _callJSMethod(sdkContext, "onChangeInputResolution", [_wrapFunction(callback)]);
+  }
+
+  @override
+  void setOnColorFilterSuccessCallback(Object sdkContext, Function(String id)? callback) {
+    _callJSMethod(sdkContext, "onColorFilterSuccess", [_wrapFunction(callback)]);
+  }
+
+  @override
+  void setOnErrorCallback(Object sdkContext, Function(dynamic)? callback) {
+    _callJSMethod(sdkContext, "onError", [_wrapFunction(callback)]);
+  }
+
+  @override
+  void setOnLowLightSuccessCallback(Object sdkContext, Function? callback) {
+    _callJSMethod(sdkContext, "onLowLightSuccess", [_wrapFunction(callback)]);
   }
 
   @override
@@ -237,6 +314,38 @@ class EffectsSDKWeb extends EffectsSDKPlatform {
   }
 
   @override
+  bool enableColorFilter(Object sdkContext) {
+    return _callJSMethod(sdkContext, "enableColorFilter", []);
+  }
+
+  @override
+  bool disableColorFilter(Object sdkContext) {
+    return _callJSMethod(sdkContext, "disableColorFilter", []);
+  }
+
+  @override
+  Future<void> setColorFilterConfig(Object sdkContext, ColorFilterConfig config) {
+    final jsConfig = jsutil.newObject();
+    _setPropertyIfNotNull(jsConfig, "lut", config.lut);
+    _setPropertyIfNotNull(jsConfig, "power", config.power);
+    _setPropertyIfNotNull(jsConfig, "capacity", config.capacity);
+
+    final completer = Completer();
+    if (null != config.lut) {
+      jsutil.setProperty(jsConfig, "promise", _jsifyCompleter(completer));
+    }
+    bool ok = _callJSMethod(sdkContext, "setColorFilterConfig", [jsConfig]);
+    if (!ok) {
+      completer.completeError(StateError("ColorFilter is not initialized"));
+    }
+    else if(null == config.lut) {
+      completer.complete();
+    }
+
+    return completer.future;
+  }
+
+  @override
   void setColorCorrectorPower(Object sdkContext, double power) {
     _callJSMethod(sdkContext, "setColorCorrectorPower", [power]);
   }
@@ -254,6 +363,18 @@ class EffectsSDKWeb extends EffectsSDKPlatform {
   @override
   void disableLowLightEffect(Object sdkContext) {
     _callJSMethod(sdkContext, "disableLowLightEffect", []);
+  }
+
+  @override
+  void setLowLightEffectConfig(Object sdkContext, LowLightConfig config) {
+    final jsConfig = jsutil.newObject();
+    _setPropertyIfNotNull(jsConfig, "modelWidth", config.modelWidth);
+    _setPropertyIfNotNull(jsConfig, "modelHeight", config.modelHeight);
+    _setPropertyIfNotNull(jsConfig, "power", config.power);
+    bool ok = _callJSMethod(sdkContext, "setLowLightEffectConfig", [jsConfig]); 
+    if (!ok) {
+      throw StateError("LowLightEffect is not initialized");
+    } 
   }
 
   @override
@@ -300,6 +421,12 @@ class EffectsSDKWeb extends EffectsSDKPlatform {
   }
 
   @override
+  void setOutputFrameFormat(Object sdkContext, FrameFormat format) {
+    final formatName = webNameOfFrameFormat(format);
+    _callJSMethod(sdkContext, "setOutputFrameFormat", [formatName]);
+  }
+
+  @override
   void setOutputResolution(Object sdkContext, int? width, int? height) {
     var resolution = jsutil.newObject();
     if (width != null) {
@@ -309,6 +436,11 @@ class EffectsSDKWeb extends EffectsSDKPlatform {
       jsutil.setProperty(resolution, "height", height * 100);
     }
     _callJSMethod(sdkContext, "setOutputResolution", [resolution]);
+  }
+
+  @override
+  void clearOutputResolution(Object sdkContext) {
+    _callJSMethod(sdkContext, "clearOutputResolution", []);
   }
 
   @override
@@ -334,13 +466,12 @@ class EffectsSDKWeb extends EffectsSDKPlatform {
   @override
   Object createLowerThirdComponent(
       Object sdkContext, LowerThirdOptions options) {
-    final jsOptions = _jsifyLowerThirdOptions(options);
+    final jsParams = jsutil.newObject();
+    final lowerThirdType = (null != options.type)? options.type! : LowerThirdType.lowerthird_1;
+    jsutil.setProperty(jsParams, "component", webNameOfLowerThirdType(lowerThirdType));
+    jsutil.setProperty(jsParams, "options", _jsifyLowerThirdOptions(options));
 
-    final params = jsutil.newObject();
-    jsutil.setProperty(params, "component", "lowerthird_1");
-    jsutil.setProperty(params, "options", jsOptions);
-
-    return _callJSMethod(sdkContext, "createComponent", [params]);
+    return _callJSMethod(sdkContext, "createComponent", [jsParams]);
   }
 
   @override
@@ -388,8 +519,34 @@ class EffectsSDKWeb extends EffectsSDKPlatform {
   }
 
   @override
+  Object createWatermarkComponent(Object sdkContext, WatermarkOptions options) {
+    final jsOptions = _jsifyWatermarkOptions(options);
+
+    final params = jsutil.newObject();
+    jsutil.setProperty(params, "component", "watermark");
+    jsutil.setProperty(params, "options", jsOptions);
+
+    final result = _callJSMethod(sdkContext, "createComponent", [params]);
+    return result;
+  }
+
+  @override
   void addComponent(Object sdkContext, Object component, String id) {
     _callJSMethod(sdkContext, "addComponent", [component, id]);
+  }
+
+  @override
+  void removeComponent(Object sdkContext, String id) {
+    if (!jsutil.hasProperty(sdkContext, "components")) {
+      return;
+    }
+    final components = jsutil.getProperty<Object>(sdkContext, "components");
+    jsutil.delete(components, id);
+  }
+
+  @override
+  void componentDestroy(Object component) {
+    _callJSMethod(component, "destroy", []);
   }
 
   @override
@@ -455,15 +612,19 @@ class EffectsSDKWeb extends EffectsSDKPlatform {
       jsutil.setProperty(options, "id", url);
       _callJSMethod(component, "setOptions", [options]);
     } else {
-      final sticker = jsutil.newObject();
-      jsutil.setProperty(sticker, "url", url);
-
-      final options = jsutil.newObject();
-      jsutil.setProperty(options, "sticker", sticker);
-
+      final options = _jsifyAddSticker(url, false);
       _callJSMethod(component, "setOptions", [options]);
       stickerContext.urls.add(url);
     }
+  }
+
+  @override
+  void componentPreloadSticker(Object component, String url) {
+    final stickerContext = _getStickerContext(component);
+
+    final options = _jsifyAddSticker(url, true);
+    _callJSMethod(component, "setOptions", [options]);
+    stickerContext.urls.add(url);
   }
 
   @override
@@ -489,6 +650,23 @@ class EffectsSDKWeb extends EffectsSDKPlatform {
     _callJSMethod(component, "setOptions", [jsOptions]);
   }
 
+  @override
+  void componentSetWatermarkOptions(Object component, WatermarkOptions options) {
+    final jsOptions = _jsifyWatermarkOptions(options);
+
+    _callJSMethod(component, "setOptions", [jsOptions]);
+  }
+
+  @override
+  bool freeze(Object sdkContext) {
+    return _callJSMethod(sdkContext, "freeze", []);
+  }
+
+  @override
+  bool unfreeze(Object sdkContext) {
+    return _callJSMethod(sdkContext, "unfreeze", []);
+  }
+
   Object _jsifyLowerThirdOptions(LowerThirdOptions options) {
     final jsOptions = jsutil.newObject();
     final jsTextOptions = jsutil.newObject();
@@ -498,7 +676,11 @@ class EffectsSDKWeb extends EffectsSDKPlatform {
 
     final jsColorOptions = jsutil.newObject();
     _setPropertyIfNotNull(
-        jsColorOptions, "primary", _removeAlphaChannel(options.primaryColor));
+      jsColorOptions, "primary", _removeAlphaChannel(options.primaryColor)
+    );
+    _setPropertyIfNotNull(
+      jsColorOptions, "secondary", _removeAlphaChannel(options.secondaryColor)
+    );
     _setPropertyIfNotNull(jsOptions, "color", jsColorOptions);
 
     if (null != options.left || null != options.bottom) {
@@ -513,18 +695,33 @@ class EffectsSDKWeb extends EffectsSDKPlatform {
     return jsOptions;
   }
 
+  Object _jsifyAddSticker(String url, bool loadOnly) {
+      final sticker = jsutil.newObject();
+      jsutil.setProperty(sticker, "url", url);
+      if (loadOnly) {
+        jsutil.setProperty(sticker, "silenceMode", true);
+      }
+
+      final options = jsutil.newObject();
+      jsutil.setProperty(options, "sticker", sticker);
+
+      return options;
+  }
+
   Object _jsifyStickersOptions(StickerOptions options) {
     final jsOptions = jsutil.newObject();
     _setPropertyIfNotNull(
         jsOptions, "duration", options.duration.inMilliseconds);
     _setPropertyIfNotNull(jsOptions, "capacity", options.capacity);
     _setPropertyIfNotNull(jsOptions, "size", options.size);
+    _setPropertyIfNotNull(jsOptions, "ratio", options.ratio);
+    _setPropertyIfNotNull(jsOptions, "animationSpeed", options.animationSpeed);
     if (null != options.position) {
       final pos = jsutil.newObject();
       _setPropertyIfNotNull(pos, "x", options.position?.x);
       _setPropertyIfNotNull(pos, "y", options.position?.y);
-      _setPropertyIfNotNull(pos, "placement",
-          webNameOfStickerPlacement(options.position?.placement));
+      _setPropertyIfNotNull(pos, "placement", 
+        webNameOfPlacement(options.position?.placement));
 
       _setPropertyIfNotNull(jsOptions, "position", pos);
     }
@@ -535,6 +732,26 @@ class EffectsSDKWeb extends EffectsSDKPlatform {
   Object _jsifyOverlayScreenOptions(OverlayScreenOptions options) {
     final jsOptions = jsutil.newObject();
     jsutil.setProperty(jsOptions, "url", options.url);
+
+    return jsOptions;
+  }
+
+  Object _jsifyWatermarkOptions(WatermarkOptions options) {
+    final jsOptions = jsutil.newObject();
+    _setPropertyIfNotNull(jsOptions, "url", options.url);
+    _setPropertyIfNotNull(jsOptions, "size", options.size);
+    if (null != options.position) {
+      _setPropertyIfNotNull(jsOptions, "position", _jsifyComponentPosition(options.position!));
+    }
+
+    return jsOptions;
+  }
+
+  Object _jsifyComponentPosition(ComponentPosition pos) {
+    final jsOptions = jsutil.newObject();
+    _setPropertyIfNotNull(jsOptions, "x", pos.x);
+    _setPropertyIfNotNull(jsOptions, "y", pos.y);
+    _setPropertyIfNotNull(jsOptions, "placement", webNameOfPlacement(pos.placement));
 
     return jsOptions;
   }
@@ -551,20 +768,22 @@ class EffectsSDKWeb extends EffectsSDKPlatform {
     jsutil.setProperty(object, name, value);
   }
 
-  dynamic _wrapFunction(Function? func) {
-    if (null != func) {
-      return js.allowInterop(func);
-    } else {
-      return null;
-    }
+  Object _jsifyCompleter(Completer completer) {
+    final jsPromiseContainer = jsutil.newObject();
+    resolve() { completer.complete(); }
+    jsutil.setProperty(jsPromiseContainer, "resolve", _wrapFunction(resolve));
+    reject(e) { completer.completeError(e); };
+    jsutil.setProperty(jsPromiseContainer, "reject", _wrapFunction(reject));
+
+    return jsPromiseContainer;
+  }
+
+  dynamic _wrapFunction<T extends Function>(T? func) {
+    return (null != func)? js.allowInterop(func) : null;
   }
 
   int? _removeAlphaChannel(int? color) {
-    if (null != color) {
-      return 0x00ffffff & color;
-    } else {
-      return null;
-    }
+    return (null != color)? (0x00ffffff & color) : null;
   }
 
   StickerContext _getStickerContext(Object stickerComponent) {

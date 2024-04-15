@@ -38,9 +38,17 @@ class EffectsSDK {
 
   bool get isReady => _ready;
 
+  Future<void> cache({ bool clear = false}) {
+    return EffectsSDKPlatform.instance.cache(_sdkContext, clear: clear);
+  }
+
   void clear() {
     EffectsSDKPlatform.instance.clear(_sdkContext);
     _ready = false;
+  }
+
+  Future<void> preload() {
+    return EffectsSDKPlatform.instance.preload(_sdkContext);
   }
 
   bool run() {
@@ -163,6 +171,22 @@ class EffectsSDK {
     EffectsSDKPlatform.instance.setColorCorrectorPeriod(_sdkContext, periodMs);
   }
 
+  bool enableColorFilter() {
+    _throwIfNotReady("enableColorFilter()");
+    return EffectsSDKPlatform.instance.enableColorFilter(_sdkContext);
+  }
+
+  bool disableColorFilter() {
+    _throwIfNotReady("disableColorFilter()");
+    return EffectsSDKPlatform.instance.disableColorFilter(_sdkContext);
+  }
+
+  Future<void> setColorFilter({dynamic lut, double? power, int? capacity}) {
+    _throwIfNotReady("setColorFilter()");
+    final config = ColorFilterConfig(lut: lut, power: power, capacity: capacity);
+    return EffectsSDKPlatform.instance.setColorFilterConfig(_sdkContext, config);
+  }
+
   void enableLowLightEffect() {
     _throwIfNotReady("enableLowLightEffect()");
     EffectsSDKPlatform.instance.enableLowLightEffect(_sdkContext);
@@ -171,6 +195,12 @@ class EffectsSDK {
   void disableLowLightEffect() {
     _throwIfNotReady("disableLowLightEffect()");
     EffectsSDKPlatform.instance.disableLowLightEffect(_sdkContext);
+  }
+
+  void setLowLightEffect({double? power, int? modelWidth, int? modelHeight}) {
+    _throwIfNotReady("setLowLightEffect()");
+    final config = LowLightConfig(power: power, modelWidth: modelWidth, modelHeight: modelHeight);
+    EffectsSDKPlatform.instance.setLowLightEffectConfig(_sdkContext, config);
   }
 
   void setLowLightEffectPower(double value) {
@@ -204,9 +234,19 @@ class EffectsSDK {
     EffectsSDKPlatform.instance.setFpsLimit(_sdkContext, limit);
   }
 
+  void setOutputFrameFormat(FrameFormat format) {
+    _throwIfNotReady("setOutputFrameFormat()");
+    EffectsSDKPlatform.instance.setOutputFrameFormat(_sdkContext, format);
+  }
+
   void setOutputResolution(int? width, int? height) {
     _throwIfNotReady("setOutputResolution()");
     EffectsSDKPlatform.instance.setOutputResolution(_sdkContext, width, height);
+  }
+
+  void clearOutputResolution() {
+    _throwIfNotReady("clearOutputResolution()");
+    EffectsSDKPlatform.instance.clearOutputResolution(_sdkContext);
   }
 
   void enableFrameSkipping() {
@@ -229,9 +269,13 @@ class EffectsSDK {
     EffectsSDKPlatform.instance.disablePipelineSkipping(_sdkContext);
   }
 
-  LowerThirdComponent createLowerThirdComponent(
-      {String? title, String? subtitle, int? primaryColor}) {
+  LowerThirdComponent createLowerThirdComponent({
+      LowerThirdType? type,
+      String? title, 
+      String? subtitle, 
+      int? primaryColor}) {
     final options = LowerThirdOptions();
+    options.type = type;
     options.title = title;
     options.subtitle = subtitle;
     options.primaryColor = primaryColor;
@@ -242,8 +286,10 @@ class EffectsSDK {
   LowerThirdComponent createLowerThirdComponentWithOptions(
       LowerThirdOptions options) {
     _throwIfNotReady("createLowerThirdComponentWithOptions()");
-    Object componentContext = EffectsSDKPlatform.instance
-        .createLowerThirdComponent(_sdkContext, options);
+    Object componentContext = EffectsSDKPlatform.instance.createLowerThirdComponent(
+      _sdkContext, 
+      options
+    );
 
     return LowerThirdComponent(componentContext);
   }
@@ -258,12 +304,25 @@ class EffectsSDK {
     return createStickersComponentWithOptions(options);
   }
 
-  StickersComponent createStickersComponentWithOptions(StickerOptions options) {
+  StickersComponent createStickersComponentWithOptions(
+      StickerOptions options) {
     _throwIfNotReady("createStickerWithOptions()");
     final componentContext = EffectsSDKPlatform.instance
         .createStickersComponent(_sdkContext, options);
 
     return StickersComponent(componentContext);
+  }
+
+  WatermarkComponent createWatermarkComponent({
+      required String url,
+      double? size,
+      ComponentPosition? pos}) {
+    
+    final options = WatermarkOptions(url: url, size: size, position: pos);
+    final componentContext = EffectsSDKPlatform.instance
+      .createWatermarkComponent(_sdkContext, options);
+
+    return WatermarkComponent(componentContext);
   }
 
   OverlayScreenComponent createOverlayScreenComponent({required String url}) {
@@ -283,8 +342,52 @@ class EffectsSDK {
     _componentMap[id] = component;
   }
 
+  void removeComponent(String id) {
+    _throwIfNotReady("removeComponent()");
+    EffectsSDKPlatform.instance.removeComponent(_sdkContext, id);
+    _componentMap.remove(id);
+  }
+
   UnmodifiableMapView<String, Component> get components =>
       UnmodifiableMapView<String, Component>(_componentMap);
+
+  bool freeze() {
+    _throwIfNotReady("freeze()");
+    return EffectsSDKPlatform.instance.freeze(_sdkContext);
+  }
+
+  bool unfreeze() {
+    _throwIfNotReady("unfreeze()");
+    return EffectsSDKPlatform.instance.unfreeze(_sdkContext);
+  }
+
+  set onChangeInputResolution(Function? callback) {
+    EffectsSDKPlatform.instance.setOnChangeInputResolutionCallback(
+      _sdkContext, 
+      callback
+    );
+  }
+
+  set onColorFilterSuccess(Function(String id)? callback) {
+    EffectsSDKPlatform.instance.setOnChangeInputResolutionCallback(
+      _sdkContext, 
+      callback
+    );
+  }
+
+  set onError(Function(dynamic e)? callback) {
+    EffectsSDKPlatform.instance.setOnErrorCallback(
+      _sdkContext, 
+      callback
+    );
+  }
+
+  set onLowLightSuccess(Function? callback) {
+    EffectsSDKPlatform.instance.setOnLowLightSuccessCallback(
+      _sdkContext, 
+      callback
+    );
+  }
 
   void _throwIfNotReady(String methodName) {
     if (!_ready) {
