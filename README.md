@@ -2,18 +2,18 @@
 
 # Video Effects SDK: Flutter plugin and samples
 
-Video Effects SDK plugin for Flutter Web
+Video Effects SDK plugin for Flutter Web  
 
 Add real-time AI video enhancements that make the video meeting experience more effective and comfortable to your application.
 This repository contains the Flutter plugin that integrates Video Effects SDK Web into your project/product that uses **Flutter WebRTC** plugin.
 The plugin can work with **Flutter WebRTC**, just put a **MediaStream** into the SDK and use the returned **MediaStream**.
 Also, there is the example Flutter project, which, if you have a license, you can build and run to see the plugin in action.
 
-## Obtaining an Effects SDK License
+## Obtaining an Effects SDK License  
 
 To receive an **Effects SDK** license, please fill out the contact form on [effectssdk.com](https://effectssdk.com/contacts) website.
 
-## Features
+## Features  
 
 - Virtual backgrounds (put an image, color, or WebRTC MediaStream as a background)
 - Background blur
@@ -26,16 +26,16 @@ To receive an **Effects SDK** license, please fill out the contact form on [effe
 
 ### How to add
 
-Add `<script src="https://effectssdk.ai/sdk/web/3.1.5/tsvb-web.js"></script>` to your index.html.
+Add `<script src="https://effectssdk.ai/sdk/web/3.1.5/tsvb-web.js"></script>` to your index.html.  
 
-Add next code as a dependency in your pubspec.yaml file.
+Add next code as a dependency in your pubspec.yaml file.  
 ```yaml
   effects_sdk:
     git:
       url: https://github.com/EffectsSDK/flutter-plugin.git
 ```
 
-### Usage
+### Usage  
 
 - Create an instance of **EffectsSDK** and pass your Customer ID to the constructor.
 - Use `EffectsSDK.useStream(mediaStream)` to put a stream to be processed.
@@ -88,13 +88,21 @@ Returns a stream with applied effects.
 isReady -\> **bool**  
 The property is true when SDK is ready to process video, method `run` can be called, and features can be activated.
 
+cache({ **bool** clear }) -\> **Future\<void\>**  
+Preload ML resources and put it to named cache. Will preload all required models files based on the sdk.config(). Could be used on the app initialisation. Will speed up future SDK initialization.  
+Arguments:  
+- **bool** clear - pass true to delete cache objects.
+
 clear() -\> **void**  
 Disables enabled features and stops processing.
+
+preload() -\> **Future\<void\>**  
+Initialize all ML resources (models and inference objects). The initial configurations are obtained from sdk.config().
 
 config(**Config** *config*) -\> **void**  
 Ability to configure sdk execution environment.  
 Arguments:
-- **Config** *config* - settings to be changed, [see **Config**](#class-config)
+- **Config** *config* - settings to be changed, [see Config](#class-config)
 
 Example of how to change default segmentation preset  
 ```dart
@@ -230,6 +238,20 @@ Set period in milliseconds for color correction model working.
 Arguments:
 - **int** periodMs - Period duration in milliseconds. Can be from 0 to 5000 (default 1000)
 
+enableColorFilter() -\> **bool**  
+Enable color-filter effect.  
+
+disableColorFilter() -\> **bool**  
+Disable color-filter effect.
+
+setColorFilter({**dynamic** lut, **double**? power, **int**? capacity}) -\> **Future\<void\>**  
+Set ColorFilter options.   
+Arguments:
+- **dynamic** lut - url to *.cube file with Color LUT.
+- **double**? power - a value from 0 to 1. Higher number -\> more visible effect.
+- **int**? capacity - How much Color LUTs to cache.
+
+
 enableLowLightEffect() -\> **void**  
 Enable the brightening effect.  
 Low Light Effect enhances the brightness of a dark video. It is useful when the video has a darker environment.
@@ -238,30 +260,45 @@ It's recommended to use together with Color Correction.
 disableLowLightEffect() -\> **void**  
 Disable the brightening effect.
 
-setLowLightEffectPower(**double** power) -\> **void**  
-Control how strong the effect aplied.
+setLowLightEffect({**double**? power, **int**? modelWidth, **int**? modelHeight}) -\> **void**  
+Set LowLight Effect options.  
+Arguemnts: 
+- **double**? power -  a value from 0 to 1. Higher number -\> more visible effect.
+- **int**? modelWidth, **int**? modelHeight - input size for ML Model, may increase quality, but lower perfomance.
+
+setLowLightEffectPower(**double** power) -\> **void**   
+Control how strong the effect aplied.  
 Arguments:
 - **double** power - a value from 0 to 1. Higher number -\> more visible effect.
 
-setLayout(**Layout** layout) -\> **void**
+setLayout(**Layout** layout) -\> **void**  
 Set the layout mode. Useful for presentations.
 
-setCustomLayout({**double**? size, **double**? xOffset, **double**? yOffset}) -\> **void**
-Set a custom layout mode.
+setCustomLayout({**double**? size, **double**? xOffset, **double**? yOffset}) -\> **void**  
+Set a custom layout mode.  
 Arguments:
 - **double?** size - size of window, a value from 0 to 1.
 - **double?** xOffset - padding from the left edge, a value from 0 to 1.
 - **double?** yOffset -  padding from the top edge, a value from 0 to 1.
 
-showFps() -\> **void**
+showFps() -\> **void**  
 Show FPS statistic on the stream. (By default hidden).
 
-hideFps() -\> **void**
+hideFps() -\> **void**  
 Hide FPS statistic on the stream.
 
-setFpsLimit(**int** limit) -\> **void**
+setFpsLimit(**int** limit) -\> **void**  
 Arguments:
 - **int** limit
+
+setOutputFrameFormat(FrameFormat format) -\> **void**  
+Set format of output video frames.  
+Arguments:
+- **FrameFormat** format - format, see [FrameFormat](#enum-FrameFormat).
+
+setOutputResolution(int? width, int? height) -\> **void**  
+
+clearOutputResolution() -\> **void**  
 
 enableFrameSkipping() -\> **void**
 Enable Frame Skipping - segmentation will be running on every second frame, this will increase FPS but brings some motion trail.
@@ -273,13 +310,16 @@ enablePipelineSkipping() -\> **void**
 
 disablePipelineSkipping() -\> **void**
 
-createLowerThirdComponent({**String**? title, **String**? subtitle, **int**? primaryColor}) -\> **LowerThirdComponent**
-Create and return a new instance of **LowerThirdComponent**. For more information see **LowerThirdComponent**.
-Note: Returned **Component** should to be passed into addComponent to be shown.
+createLowerThirdComponent({**LowerThirdType**? type, **String**? title, **String**? subtitle, **int**? primaryColor}) -\> **LowerThirdComponent**
+Create and return a new instance of **LowerThirdComponent**. For more information see **LowerThirdComponent**.  
+Note: Returned **Component** should to be passed into addComponent to be shown.  
 Arguments:
+- **LowerThirdType**? type - type of lowerthird, see [LowerThirdType](#enum-lowerthirdtype).
 - **String**? title - field of **LowerThirdOptions**
 - **String**? subtitle  - field of **LowerThirdOptions**
 - **int**? primaryColor - field of **LowerThirdOptions**
+
+See [LowerThirdOptions](#class-lowerthirdoptions)
 
 Example
 ```dart
@@ -337,45 +377,75 @@ _effectsSDK.addComponent(overlay, "overlay");
 overlay.show();
 ```
 
-addComponent(**Component** component, **String** id) -\> **void**
-Add the component to pipeline. 
+createWatermarkComponent({required **String** url, **double**? size, **ComponentPosition**? pos}) -\> **WatermarkComponent**  
+Create Watermark component, see [WatermarkComponent](#class-watermarkcomponent-extends-component).  
+
+addComponent(**Component** component, **String** id) -\> **void**  
+Add the component to the pipeline. 
 Arguments:
 - **Component** component - component to be added into the pipeline.
 - **String** id - an unique identificator of component within the pipeline.
 
+removeComponent(**String** id) -\> **void**  
+Remove the component from the pipeline by ID.  
+Arguments:
+- **String** id - same id that used for addComponent.
+
 components -\> **UnmodifiableMapView**<**String**, **Component**>
 Read-only property that returns a copy of component map. Key is id.
+
+freeze() -\> **bool**  
+
+unfreeze() -\> **bool**  
+
+set onChangeInputResolution(**Function**? callback)  
+Arguments:
+- **Function**? callback
+
+set onColorFilterSuccess(**Function**(**String** id)? callback)  
+Arguments:
+- **Function**(**String** id)? callback 
+
+Callback's arguments:
+- **String** id
+
+set onError(**Function**(**dynamic** e)? callback)  
+Arguments:
+- **Function**(**dynamic** e)? callback
+
+Callback's arguments:
+- **dynamic** e - Error object.
+
+set onLowLightSuccess(**Function**? callback)  
+Arguments:
+-**Function**? callback
 
 ### class Config
 
 Config contains settings to change in Effects SDK.
 
-apiUrl -\> **String**?
-
+apiUrl -\> **String**?  
 Custom url for sdk authentication, applicable for on-premises solutions.
 
-sdkUrl -\> **String**?
-
+sdkUrl -\> **String**?  
 This parameter specify the url to SDK folder in case when you host model files by yourself.
 
-preset -\> **SegmentationPreset**? 
-
+preset -\> **SegmentationPreset**?  
 Specify default segmentation preset (quality, balanced, speed, lightning).
 
-proxy -\> **bool**?
+mlBackend -\> **MLBackend**  
+See [MLBackend](#enum-mlbackend)
 
+proxy -\> **bool**?  
 Configuration specify if segmentation should be working in separate worker thread (not in main UI thread), default value is true.
 
-stats -\> **bool**?
-
+stats -\> **bool**?  
 Enabling/disabling statistics sending.
 
-models -\> **Map\<String, String\>**?
-
+models -\> **Map\<String, String\>**?  
 Ability to provide custom name of model, if it's empty feature will be disabled.
 
-wasmPaths -\> **Map\<String, String\>**?
-
+wasmPaths -\> **Map\<String, String\>**?  
 Currently wasm files are loading from the same directory where SDK is placed, but custom urls also supported (for example you can load it from CDNs).
 
 Example
@@ -388,6 +458,12 @@ _effectsSDK.config(Config(
       'ort-wasm-simd-threaded.wasm': 'url'
 }));
 ```
+
+### enum FrameFormat
+
+Available values:
+* rgbx - 32 bit format with ignored alpha channel;
+* i420 - Planar YUV 4:2:0 format. See [I420](https://wiki.videolan.org/YUV#I420).
 
 ### enum SegmentationPreset
 
@@ -409,17 +485,17 @@ Available values:
 Components system allows add Overlays, Lower Thirds, videos and images to the pipeline.
 **Component** is base class of all components. Instance of **Component** does not creates directly, to create **Component** use EffectsSDK methods.
 
-type -\> **ComponentType**
-
+type -\> **ComponentType**  
 Read-only return type of **Component**.
 
-show() -\> **void**
-
+show() -\> **void**  
 Make this component visible.
 
-hide() -\> **void**
-
+hide() -\> **void**  
 Make this component invisible.
+
+destroy() -\> **void**  
+Release all resources used by the component.
 
 setOnBeforeShow(**Function**? handler) -\> **void**
 Set function that will be called when this component is about to show.
@@ -448,9 +524,20 @@ Available values:
 * lowerThird
 * overlayScreen
 
+### enum LowerThirdType
+
+Available values:
+* lowerthird_1
+* lowerthird_2
+* lowerthird_3
+* lowerthird_4
+* lowerthird_5
+
 ### class LowerThirdOptions
 
 LowerThirdOptions contains settings of Lower Third functional.
+
+type -\> **LowerThirdType**?
 
 title -\> **String**?
 
@@ -458,15 +545,14 @@ subtitle -\> **String**?
 
 primaryColor -\> **int**?
 
+secondaryColor -\> **int**?  
 A 32 bit color value in ARGB format. (See [dart:ui Color](https://api.flutter.dev/flutter/dart-ui/Color/value.html))
 Note: Alpha channel is ignored.
 
-left -\> **double**?
-
+left -\> **double**?  
 Horizontal position of lower third. 0 at left border, 1 at right border
 
-bottom -\> **double**?
-
+bottom -\> **double**?  
 Vertical position of lower third. 0 at bottom border, 1 at top border
 
 ### class LowerThirdComponent extends Component
@@ -484,7 +570,16 @@ Make this visible and begin expanding animation.
 hideLowerThird() -\> **void**
 Begin collapsing animation and make this invisible in the end.
 
-### enum StickerPlacement 
+### enum MLBackend
+
+Determinates backend for ML processing.
+
+Available values:
+* auto 
+* cpu - Wasm for web.
+* gpu - WebGPU for web.
+
+### enum Placement 
 
 Available values:
 * topLeft,
@@ -494,53 +589,64 @@ Available values:
 * bottomRight,
 * custom
 
-### class StickerPosition 
+### enum StickerPlacement 
 
-x -\> **double**?
+Alias Of **Placement**
 
+### class ComponentPosition 
+
+x -\> **double**?  
 Horizontal position on screen. Ignored if placement is not **StickerPlacement**.custom.
 0 at left border, 1 at right border
 
-y -\> **double**?
-
+y -\> **double**?  
 Vertical position on screen. Ignored if placement is not **StickerPlacement**.custom.
 0 at top border, 1 at bottom border
 
-placement -\> **StickerPlacement**?
-
+placement -\> **ComponentPlacement**?  
 Determinates position of sticker on screen. 
 If placement is **StickerPlacement**.custom then position is determinated by x and y coordinates.
 
-StickerPosition({**double**? x, **double**? y, **StickerPlacement**? placement}) 
+ComponentPlacement({**double**? x, **double**? y, **Placement**? placement}) 
 Constructor
+
+### class StickerPosition 
+
+Alias of **ComponentPosition**
 
 ### class StickerOptions
   
-capacity -\> **int**
-
+capacity -\> **int**  
 Max number of loaded media files in cache.
 
-duration -\> **Duration**
-
+duration -\> **Duration**  
 Duration of sticker on screen.
 
-position -\> **StickerPosition**?
+animationSpeed -\> **double**?  
+Multiplier of animation speed.
 
+position -\> **StickerPosition**?  
 Position of sticker on screen.
 
-size -\> **double**?
-
+size -\> **double**?  
 Relative size of sticker. From 0 to 1.
+
+ratio -\> **double**?
 
 ### class StickersComponent extends Component 
 
 Renders a media file on screen
 
-playSticker({required String url}) -\> **void**
-Load and render media. If media is already loaded then render immediatelly.
-Component keeps last **StickerOptions**.capacity files.
-Old media files will be unloaded.
-Arguments:
+playSticker({required **String** url}) -\> **void**  
+Load and render media. If media is already loaded then render immediatelly.  
+Component keeps last **StickerOptions**.capacity files.  
+Old media files will be unloaded.  
+Arguments: 
+- **String** url - url to a media file.
+
+preloadSticker({required **String** url}) -\> **void**  
+Load media without rendering and add it into storage. Can be immediatelly rendered by **StickersComponent**.playSticker.  
+Arguments:  
 - **String** url - url to a media file.
 
 setOnLoadSuccess(**Function**(**String** url, **String**? removedUrl)? handler) -\> **void**
@@ -568,8 +674,7 @@ Arguments:
 
 ### class OverlayScreenOptions 
 
-url -\> **String**
-
+url -\> **String**  
 Url to a media file.
 
 OverlayScreenOptions({required **String** url});
@@ -584,6 +689,18 @@ setOptions(**OverlayScreenOptions** options) -\> **void**
 Reconfigure this **Component**. Can be used to choose another media file.
 Arguments:
 - **OverlayScreenOptions** options 
+
+### class WatermarkOptions
+
+url - **String**? - link to a media file  
+position - **ComponentPosition**?  
+size - **double**?  
+
+### class WatermarkComponent extends Component
+
+setOptions(**WatermarkOptions** options) -\> **void**  
+Arguments:
+- **WatermarkOptions** options.
 
 ### enum FitMode 
 
