@@ -14,3 +14,5 @@ export "src/effects_sdk_components.dart"
         StickerPosition,
         StickersComponent,
         OverlayScreenComponent;
+
+export "src/effects_sdk_error.dart" show ErrorType, ErrorEmitter, ErrorObject; 

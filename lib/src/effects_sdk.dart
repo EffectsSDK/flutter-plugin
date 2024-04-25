@@ -6,6 +6,7 @@ import 'effects_sdk_components.dart';
 import 'effects_sdk_platform_interface.dart';
 import 'effects_sdk_config.dart';
 import 'effects_sdk_enums.dart';
+import 'effects_sdk_error.dart';
 
 class EffectsSDK {
   final Object _sdkContext;
@@ -375,7 +376,7 @@ class EffectsSDK {
     );
   }
 
-  set onError(Function(dynamic e)? callback) {
+  set onError(Function(ErrorObject e)? callback) {
     EffectsSDKPlatform.instance.setOnErrorCallback(
       _sdkContext, 
       callback

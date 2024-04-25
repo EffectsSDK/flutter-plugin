@@ -11,6 +11,7 @@ import 'effects_sdk_components.dart';
 import 'effects_sdk_config.dart';
 import 'effects_sdk_platform_interface.dart';
 import 'effects_sdk_enums.dart';
+import 'effects_sdk_error.dart';
 
 Map<Layout, String> webNamesOfLayout() {
   return {
@@ -80,6 +81,28 @@ String webNameOfLowerThirdType(LowerThirdType type) {
 
 String? webMLProvider(MLBackend? mlBackend) {
   return (null != mlBackend)? webMLProviders()[mlBackend] : null;
+}
+
+Map<String, ErrorEmitter> webEmittersMap() {
+  return {
+    "atsvb": ErrorEmitter.tsvb,
+    "components_system": ErrorEmitter.componentSystem,
+    "stream_processor": ErrorEmitter.streamProcessor,
+    "ml_inference": ErrorEmitter.mlInference,
+    "preset_init": ErrorEmitter.presetInit,
+    "renderer": ErrorEmitter.renderer,
+    "recorder": ErrorEmitter.recorder,
+
+    "effect_virtual_background": ErrorEmitter.effectVirtualBackground,
+    "effect_color_correction": ErrorEmitter.effectColorCorrection,
+    "effect_color_filter": ErrorEmitter.effectColorFilter,
+    "effect_smart_zoom": ErrorEmitter.effectSmartZoom,
+    "effect_low_light": ErrorEmitter.effectLowLight
+  };
+}
+
+ErrorEmitter? webEmitterByName(String? name) {
+  return (null != name)? webEmittersMap()[name]: null;
 }
 
 class StickerContext {
@@ -195,8 +218,30 @@ class EffectsSDKWeb extends EffectsSDKPlatform {
   }
 
   @override
-  void setOnErrorCallback(Object sdkContext, Function(dynamic)? callback) {
-    _callJSMethod(sdkContext, "onError", [_wrapFunction(callback)]);
+  void setOnErrorCallback(Object sdkContext, Function(ErrorObject)? callback) {
+    if (null == callback) {
+      _callJSMethod(sdkContext, "onError", [null]);
+      return;
+    }
+
+    jsCallback(Object e) {
+      final typeName = jsutil.getProperty<String>(e, "type");
+      final errorType = ErrorType.values.firstWhere((element) => element.name == typeName);
+      final emitter = webEmitterByName(
+        _getOptionalProperty<String>(e, "emitter")
+      );
+
+      final errorObject = ErrorObject(
+        message: jsutil.getProperty<String>(e, "message"),
+        type: errorType,
+        emitter: emitter,
+        cause: jsutil.dartify(_getOptionalProperty(e, "cause"))
+      );
+
+      callback.call(errorObject);
+    }
+
+    _callJSMethod(sdkContext, "onError", [_wrapFunction(jsCallback)]);
   }
 
   @override
@@ -780,6 +825,10 @@ class EffectsSDKWeb extends EffectsSDKPlatform {
 
   dynamic _wrapFunction<T extends Function>(T? func) {
     return (null != func)? js.allowInterop(func) : null;
+  }
+
+  T? _getOptionalProperty<T>(Object o, Object name) {
+    return jsutil.hasProperty(o, name)? jsutil.getProperty<T>(o, name) : null;
   }
 
   int? _removeAlphaChannel(int? color) {

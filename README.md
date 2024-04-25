@@ -398,27 +398,20 @@ freeze() -\> **bool**
 
 unfreeze() -\> **bool**  
 
-set onChangeInputResolution(**Function**? callback)  
-Arguments:
-- **Function**? callback
+onChangeInputResolution -\> **Function**?  
 
-set onColorFilterSuccess(**Function**(**String** id)? callback)  
-Arguments:
-- **Function**(**String** id)? callback 
+onColorFilterSuccess -\> **Function**(**String** *id*)?  
 
 Callback's arguments:
-- **String** id
+- **String** *id*
 
-set onError(**Function**(**dynamic** e)? callback)  
-Arguments:
-- **Function**(**dynamic** e)? callback
+onError -\> **Function**(**ErrorObject** *e*)?  
+Holds callback for errors. See [ErrorObject](#class-errorobject).  
 
 Callback's arguments:
-- **dynamic** e - Error object.
+- **ErrorObject** *e* - Error object with description of the occurred error.
 
-set onLowLightSuccess(**Function**? callback)  
-Arguments:
--**Function**? callback
+onLowLightSuccess -\> **Function**?  
 
 ### class Config
 
@@ -714,3 +707,38 @@ Available values:
 * center;
 * leftBottom;
 * rightBottom;
+
+### class ErrorObject  
+Holds a description of an Error, warning or info.  
+
+message -\> **String**  
+
+type -\> **ErrorType**  
+
+emitter -\> **ErrorEmitter**?  
+
+cause -\> **Object**?  
+
+### enum ErrorType 
+  
+Available values:
+* info
+* warning
+* error
+
+### enum ErrorEmitter 
+
+Available values:
+* tsvb
+* componentSystem
+* streamProcessor
+* mlInference
+* presetInit
+* renderer
+* recorder
+
+* effectVirtualBackground
+* effectColorCorrection
+* effectColorFilter
+* effectSmartZoom
+* effectLowLigh

@@ -4,6 +4,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
 import 'effects_sdk_components.dart';
 import 'effects_sdk_config.dart';
 import 'effects_sdk_enums.dart';
+import 'effects_sdk_error.dart';
 import 'effects_sdk_method_channel.dart';
 
 abstract class EffectsSDKPlatform extends PlatformInterface {
@@ -76,7 +77,7 @@ abstract class EffectsSDKPlatform extends PlatformInterface {
     throw UnimplementedError('setOnColorFilterSuccessCallback() has not been implemented.');
   }
 
-  void setOnErrorCallback(Object sdkContext, Function(dynamic e)? callback) {
+  void setOnErrorCallback(Object sdkContext, Function(ErrorObject e)? callback) {
     throw UnimplementedError('setOnErrorCallback() has not been implemented.');
   }
 
