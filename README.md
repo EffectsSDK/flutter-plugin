@@ -26,7 +26,7 @@ To receive an **Effects SDK** license, please fill out the contact form on [effe
 
 ### How to add
 
-Add `<script src="https://effectssdk.ai/sdk/web/3.1.5/tsvb-web.js"></script>` to your index.html.  
+Add `<script src="https://effectssdk.ai/sdk/web/3.4.2/tsvb-web.js"></script>` to your index.html.  
 
 Add next code as a dependency in your pubspec.yaml file.  
 ```yaml

@@ -125,7 +125,7 @@ class EffectsSDKWeb extends EffectsSDKPlatform {
   Object createContext(String customerID) {
     if (!jsutil.hasProperty(html.window, "tsvb")) {
       throw StateError('tsvb has not been loaded.'
-          ' Please, add <script src="https://effectssdk.ai/sdk/web/3.1.5/tsvb-web.js"></script> to your index.html');
+          ' Please, add <script src="https://effectssdk.ai/sdk/web/3.4.2/tsvb-web.js"></script> to your index.html');
     }
 
     final tsvb = jsutil.getProperty(html.window, "tsvb");
