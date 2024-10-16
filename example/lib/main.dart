@@ -105,7 +105,7 @@ class _EffectsSDKSampleAppState extends State<EffectsSDKSampleApp> {
   Future<MediaStream> getVideoStream(String deviceID) async {
     Map<String, dynamic> constraints = {"video": {"optional": [{"sourceId": deviceID}]} };
     if (kIsWeb) {
-      constraints = {"video": {"deviceId": deviceID} };
+      constraints = {"video": {"deviceId": deviceID, "width": 1280, "height": 720} };
     }
     return navigator.mediaDevices.getUserMedia(constraints);
   }
