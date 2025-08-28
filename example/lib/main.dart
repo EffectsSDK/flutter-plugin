@@ -74,14 +74,15 @@ class _EffectsSDKSampleAppState extends State<EffectsSDKSampleApp> {
     }
 
     MediaStream inputStream = await getVideoStream(deviceID);
+
     _effectsSDK.clear();
-    _effectsSDK.useStream(inputStream);
-    MediaStream outputStream = _effectsSDK.getStream();
-    _rtcVideoRenderer.srcObject = outputStream;
     _effectsSDK.onReady = () {
       _effectsSDK.run();
       _effectsSDK.setBackgroundColor(Colors.greenAccent.value);
     };
+    _effectsSDK.useStream(inputStream);
+    MediaStream outputStream = _effectsSDK.getStream();
+    _rtcVideoRenderer.srcObject = outputStream;
 
     _currentCameraID = deviceID;
     stopTracks(_currentCameraStream);

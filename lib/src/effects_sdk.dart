@@ -19,7 +19,6 @@ class EffectsSDK {
     callback() {
       _ready = true;
       onReady?.call();
-      onReady = null;
     }
 
     EffectsSDKPlatform.instance.setOnReadyCallback(_sdkContext, callback);
